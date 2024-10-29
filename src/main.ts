@@ -14,9 +14,10 @@ const speed: number = 5;
 let dx: number = speed;
 let dy: number = -speed;
 
-let padRigthX: number = 10;
-let padLeftX: number = 580;
+let padRigthX: number = 580;
+let padLeftX: number = 10;
 const padHeight: number = 160;
+let padRightY: number = canvas.height / 2 - padHeight / 2;
 let padLeftY: number = canvas.height / 2 - padHeight / 2;
 let padSpeed: number = 5;
 let padLeftUp: boolean = false;
@@ -32,18 +33,34 @@ function gameloop(): void {
   x += dx;
   y += dy;
 
-  if (x + ballSize > canvas.width || x - ballSize < 0) {
-    dx = -dx;
-  }
   if (y + ballSize > canvas.height || y - ballSize < 0) {
     dy = -dy;
   }
 
+  if (
+    x + ballSize >= canvas.width - 20 &&
+    y + ballSize < padRightY + padHeight &&
+    y + ballSize > padRightY
+  ) {
+    console.log("inside padright bounds");
+    dx = -dx;
+  }
+  if (
+    x + ballSize < padLeftX + 20 &&
+    y + ballSize < padLeftY + padHeight &&
+    y + ballSize > padLeftY
+  ) {
+    console.log("inside padright bounds");
+    dx = -dx;
+  }
+
   if (padLeftUp && padLeftY > 0) {
     padLeftY -= padSpeed;
+    padRightY -= padSpeed;
   }
   if (padLeftDown && padLeftY < canvas.height - padHeight) {
     padLeftY += padSpeed;
+    padRightY += padSpeed;
   }
 
   requestAnimationFrame(gameloop);
