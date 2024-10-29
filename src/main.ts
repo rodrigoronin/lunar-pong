@@ -16,19 +16,24 @@ let dy: number = -speed;
 
 let padRigthX: number = 580;
 let padLeftX: number = 10;
-const padHeight: number = 160;
+const padHeight: number = 120;
 let padRightY: number = canvas.height / 2 - padHeight / 2;
 let padLeftY: number = canvas.height / 2 - padHeight / 2;
-let padSpeed: number = 5;
-let padLeftUp: boolean = false;
-let padLeftDown: boolean = false;
+let padSpeed: number = 3;
+
+const keys = {
+  w: { pressed: false },
+  s: { pressed: false },
+  arrowUp: { pressed: false },
+  arrowDown: { pressed: false },
+};
 
 function gameloop(): void {
   context.clearRect(0, 0, canvas.width, canvas.height);
 
   renderBall();
   renderPad(padLeftX, padLeftY);
-  renderPad(padRigthX, padLeftY);
+  renderPad(padRigthX, padRightY);
 
   x += dx;
   y += dy;
@@ -42,7 +47,6 @@ function gameloop(): void {
     y + ballSize < padRightY + padHeight &&
     y + ballSize > padRightY
   ) {
-    console.log("inside padright bounds");
     dx = -dx;
   }
   if (
@@ -50,16 +54,20 @@ function gameloop(): void {
     y + ballSize < padLeftY + padHeight &&
     y + ballSize > padLeftY
   ) {
-    console.log("inside padright bounds");
     dx = -dx;
   }
 
-  if (padLeftUp && padLeftY > 0) {
+  if (keys.w.pressed && padLeftY > 0) {
     padLeftY -= padSpeed;
+  }
+  if (keys.s.pressed && padLeftY < canvas.height - padHeight) {
+    padLeftY += padSpeed;
+  }
+
+  if (keys.arrowUp.pressed && padRightY > 0) {
     padRightY -= padSpeed;
   }
-  if (padLeftDown && padLeftY < canvas.height - padHeight) {
-    padLeftY += padSpeed;
+  if (keys.arrowDown.pressed && padRightY < canvas.height - padHeight) {
     padRightY += padSpeed;
   }
 
@@ -69,10 +77,14 @@ function gameloop(): void {
 document.addEventListener(
   "keydown",
   (e: KeyboardEvent) => {
-    if (e.key === "a") {
-      padLeftUp = true;
-    } else if (e.key === "d") {
-      padLeftDown = true;
+    if (e.key === "w") {
+      keys.w.pressed = true;
+    } else if (e.key === "s") {
+      keys.s.pressed = true;
+    } else if (e.key === "ArrowUp") {
+      keys.arrowUp.pressed = true;
+    } else if (e.key === "ArrowDown") {
+      keys.arrowDown.pressed = true;
     }
   },
   true
@@ -81,10 +93,14 @@ document.addEventListener(
 document.addEventListener(
   "keyup",
   (e: KeyboardEvent) => {
-    if (e.key === "a") {
-      padLeftUp = false;
-    } else if (e.key === "d") {
-      padLeftDown = false;
+    if (e.key === "w") {
+      keys.w.pressed = false;
+    } else if (e.key === "s") {
+      keys.s.pressed = false;
+    } else if (e.key === "ArrowUp") {
+      keys.arrowUp.pressed = false;
+    } else if (e.key === "ArrowDown") {
+      keys.arrowDown.pressed = false;
     }
   },
   true
