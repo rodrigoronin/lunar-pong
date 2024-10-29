@@ -17,13 +17,17 @@ let dy: number = -speed;
 let padRigthX: number = 10;
 let padLeftX: number = 580;
 const padHeight: number = 160;
+let padLeftY: number = canvas.height / 2 - padHeight / 2;
+let padSpeed: number = 5;
+let padLeftUp: boolean = false;
+let padLeftDown: boolean = false;
 
 function gameloop(): void {
   context.clearRect(0, 0, canvas.width, canvas.height);
 
   renderBall();
-  renderPad(padLeftX);
-  renderPad(padRigthX);
+  renderPad(padLeftX, padLeftY);
+  renderPad(padRigthX, padLeftY);
 
   x += dx;
   y += dy;
@@ -35,8 +39,39 @@ function gameloop(): void {
     dy = -dy;
   }
 
+  if (padLeftUp && padLeftY > 0) {
+    padLeftY -= padSpeed;
+  }
+  if (padLeftDown && padLeftY < canvas.height - padHeight) {
+    padLeftY += padSpeed;
+  }
+
   requestAnimationFrame(gameloop);
 }
+
+document.addEventListener(
+  "keydown",
+  (e: KeyboardEvent) => {
+    if (e.key === "a") {
+      padLeftUp = true;
+    } else if (e.key === "d") {
+      padLeftDown = true;
+    }
+  },
+  true
+);
+
+document.addEventListener(
+  "keyup",
+  (e: KeyboardEvent) => {
+    if (e.key === "a") {
+      padLeftUp = false;
+    } else if (e.key === "d") {
+      padLeftDown = false;
+    }
+  },
+  true
+);
 
 function renderBall(): void {
   context.beginPath();
@@ -45,9 +80,9 @@ function renderBall(): void {
   context.fill();
 }
 
-function renderPad(posX: number) {
+function renderPad(posX: number, posY: number) {
   context.fillStyle = "white";
-  context.fillRect(posX, canvas.height / 2 - padHeight / 2, 10, padHeight);
+  context.fillRect(posX, posY, 10, padHeight);
   context.fill();
 }
 
