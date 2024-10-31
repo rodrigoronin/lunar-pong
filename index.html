@@ -6,19 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pong</title>
 
-    <style>
-      body {
-        background-color: #3d3d3d;
-      }
-      canvas {
-        border: 1px solid white;
-      }
-    </style>
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <main id="app">
+      <div class="score">
+        <span>0</span>
+        <span>-</span>
+        <span>0</span>
+      </div>
+
       <canvas id="canvas" width="600" height="400"></canvas>
     </main>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

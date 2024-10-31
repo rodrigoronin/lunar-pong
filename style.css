@@ -1,0 +1,22 @@
+body {
+  background-color: #3d3d3d;
+}
+canvas {
+  border: 1px solid white;
+}
+#app {
+  position: absolute;
+}
+.score {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  width: 10em;
+  left: calc(300px - 35px);
+  top: 40px;
+}
+span {
+  color: white;
+  font-size: 2em;
+}
