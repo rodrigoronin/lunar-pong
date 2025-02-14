@@ -16,7 +16,7 @@ let dy: number = -speed;
 
 const padHeight: number = 120;
 const padWidth: number = 10;
-let padSpeed: number = 3;
+let padSpeed: number = 4;
 let padRigthX: number = 580;
 let padRightY: number = canvas.height / 2 - padHeight / 2;
 let padLeftX: number = 10;
@@ -43,19 +43,21 @@ function gameloop(): void {
     dy = -dy;
   }
 
-  if (
-    x + ballSize >= padRigthX &&
-    y + ballSize >= padRightY &&
-    y <= padRightY + padHeight
-  ) {
-    dx = -dx;
-  }
-  if (
-    x <= padLeftX + padWidth &&
-    y + ballSize >= padLeftY &&
-    y <= padLeftY + padHeight
-  ) {
-    dx = -dx;
+  if (x + ballSize < canvas.width && x > 0) {
+    if (
+      x + ballSize > padRigthX &&
+      y + ballSize > padRightY &&
+      y <= padRightY + padHeight
+    ) {
+      dx = -dx;
+    }
+    if (
+      x <= padLeftX + padWidth &&
+      y + ballSize > padLeftY &&
+      y < padLeftY + padHeight
+    ) {
+      dx = -dx;
+    }
   }
 
   if (keys.w.pressed && padLeftY > 0) {
