@@ -1,10 +1,10 @@
 console.log("Game started!");
 
 const canvas: HTMLCanvasElement = document.getElementById(
-  "canvas"
+  "canvas",
 ) as HTMLCanvasElement;
 const context: CanvasRenderingContext2D = canvas.getContext(
-  "2d"
+  "2d",
 ) as CanvasRenderingContext2D;
 
 let x: number = 100;
@@ -14,12 +14,13 @@ const speed: number = 5;
 let dx: number = speed;
 let dy: number = -speed;
 
-let padRigthX: number = 580;
-let padLeftX: number = 10;
 const padHeight: number = 120;
-let padRightY: number = canvas.height / 2 - padHeight / 2;
-let padLeftY: number = canvas.height / 2 - padHeight / 2;
+const padWidth: number = 10;
 let padSpeed: number = 3;
+let padRigthX: number = 580;
+let padRightY: number = canvas.height / 2 - padHeight / 2;
+let padLeftX: number = 10;
+let padLeftY: number = canvas.height / 2 - padHeight / 2;
 
 const keys = {
   w: { pressed: false },
@@ -43,16 +44,16 @@ function gameloop(): void {
   }
 
   if (
-    x + ballSize >= canvas.width - 20 &&
-    y + ballSize < padRightY + padHeight &&
-    y + ballSize > padRightY
+    x + ballSize >= padRigthX &&
+    y + ballSize >= padRightY &&
+    y <= padRightY + padHeight
   ) {
     dx = -dx;
   }
   if (
-    x + ballSize < padLeftX + 20 &&
-    y + ballSize < padLeftY + padHeight &&
-    y + ballSize > padLeftY
+    x <= padLeftX + padWidth &&
+    y + ballSize >= padLeftY &&
+    y <= padLeftY + padHeight
   ) {
     dx = -dx;
   }
@@ -87,7 +88,7 @@ document.addEventListener(
       keys.arrowDown.pressed = true;
     }
   },
-  true
+  true,
 );
 
 document.addEventListener(
@@ -103,7 +104,7 @@ document.addEventListener(
       keys.arrowDown.pressed = false;
     }
   },
-  true
+  true,
 );
 
 function renderBall(): void {
@@ -115,7 +116,7 @@ function renderBall(): void {
 
 function renderPad(posX: number, posY: number) {
   context.fillStyle = "white";
-  context.fillRect(posX, posY, 10, padHeight);
+  context.fillRect(posX, posY, padWidth, padHeight);
   context.fill();
 }
 
