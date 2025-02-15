@@ -1,11 +1,14 @@
 console.log("Game started!");
 
 const canvas: HTMLCanvasElement = document.getElementById(
-  "canvas",
+  "canvas"
 ) as HTMLCanvasElement;
 const context: CanvasRenderingContext2D = canvas.getContext(
-  "2d",
+  "2d"
 ) as CanvasRenderingContext2D;
+
+const p1Score: HTMLElement = document.getElementById("p1_score") as HTMLElement;
+const p2Score: HTMLElement = document.getElementById("p2_score") as HTMLElement;
 
 let x: number = 100;
 let y: number = 75;
@@ -58,6 +61,8 @@ function gameloop(): void {
     ) {
       dx = -dx;
     }
+  } else {
+    computePoints();
   }
 
   if (keys.w.pressed && padLeftY > 0) {
@@ -90,7 +95,7 @@ document.addEventListener(
       keys.arrowDown.pressed = true;
     }
   },
-  true,
+  true
 );
 
 document.addEventListener(
@@ -106,7 +111,7 @@ document.addEventListener(
       keys.arrowDown.pressed = false;
     }
   },
-  true,
+  true
 );
 
 function renderBall(): void {
@@ -120,6 +125,33 @@ function renderPad(posX: number, posY: number) {
   context.fillStyle = "white";
   context.fillRect(posX, posY, padWidth, padHeight);
   context.fill();
+}
+
+function computePoints(): void {
+  if (x + ballSize > canvas.width) {
+    p1Score.textContent = (Number(p1Score?.textContent) + 1).toString();
+    resetBall("left");
+  } else if (x - ballSize < 0) {
+    p2Score.textContent = (Number(p2Score?.textContent) + 1).toString();
+    resetBall("right");
+  }
+}
+
+function resetBall(direction: string): void {
+  x = canvas.width / 2;
+  y = canvas.height / 2;
+  dx = speed;
+  dy = speed;
+
+  // Changes X direction based on who scored and randomizes the Y direction
+  // from center to top or bottom
+  if (direction === "left") {
+    dx = -dx;
+    dy = (Math.random() < 0.5 ? -1 : 1) * speed;
+  } else {
+    dx = speed;
+    dy = (Math.random() < 0.5 ? -1 : 1) * speed;
+  }
 }
 
 requestAnimationFrame(gameloop);
