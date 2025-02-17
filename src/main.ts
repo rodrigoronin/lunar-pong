@@ -1,18 +1,15 @@
 console.log("Game started!");
 
 const canvas: HTMLCanvasElement = document.getElementById(
-  "canvas"
+  "canvas",
 ) as HTMLCanvasElement;
 const context: CanvasRenderingContext2D = canvas.getContext(
-  "2d"
+  "2d",
 ) as CanvasRenderingContext2D;
 
 const p1Score: HTMLElement = document.getElementById("p1_score") as HTMLElement;
 const p2Score: HTMLElement = document.getElementById("p2_score") as HTMLElement;
 
-let x: number = 100;
-let y: number = 75;
-let ballSize: number = 8;
 const speed: number = 5;
 let dx: number = speed;
 let dy: number = -speed;
@@ -32,32 +29,63 @@ const keys = {
   arrowDown: { pressed: false },
 };
 
+class Sphere {
+  x: number;
+  y: number;
+  radius: number;
+  speed: number;
+
+  constructor(
+    x = canvas.width / 2,
+    y = canvas.height / 2,
+    radius = 8,
+    speed = 5,
+  ) {
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.speed = speed;
+  }
+
+  draw(): void {
+    context.beginPath();
+    context.fillStyle = "white";
+    context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+    context.fill();
+  }
+}
+
+const sphere = new Sphere();
+
 function gameloop(): void {
   context.clearRect(0, 0, canvas.width, canvas.height);
 
-  renderBall();
+  sphere.draw();
   renderPad(padLeftX, padLeftY);
   renderPad(padRigthX, padRightY);
 
-  x += dx;
-  y += dy;
+  sphere.x += dx;
+  sphere.y += dy;
 
-  if (y + ballSize > canvas.height || y - ballSize < 0) {
+  if (
+    sphere.y + sphere.radius > canvas.height ||
+    sphere.y - sphere.radius < 0
+  ) {
     dy = -dy;
   }
 
-  if (x + ballSize < canvas.width && x > 0) {
+  if (sphere.x + sphere.radius < canvas.width && sphere.x > 0) {
     if (
-      x + ballSize > padRigthX &&
-      y + ballSize > padRightY &&
-      y <= padRightY + padHeight
+      sphere.x + sphere.radius > padRigthX &&
+      sphere.y + sphere.radius > padRightY &&
+      sphere.y <= padRightY + padHeight
     ) {
       dx = -dx;
     }
     if (
-      x <= padLeftX + padWidth &&
-      y + ballSize > padLeftY &&
-      y < padLeftY + padHeight
+      sphere.x <= padLeftX + padWidth &&
+      sphere.y + sphere.radius > padLeftY &&
+      sphere.y < padLeftY + padHeight
     ) {
       dx = -dx;
     }
@@ -95,7 +123,7 @@ document.addEventListener(
       keys.arrowDown.pressed = true;
     }
   },
-  true
+  true,
 );
 
 document.addEventListener(
@@ -111,15 +139,8 @@ document.addEventListener(
       keys.arrowDown.pressed = false;
     }
   },
-  true
+  true,
 );
-
-function renderBall(): void {
-  context.beginPath();
-  context.fillStyle = "white";
-  context.arc(x, y, ballSize, 0, 2 * Math.PI);
-  context.fill();
-}
 
 function renderPad(posX: number, posY: number) {
   context.fillStyle = "white";
@@ -128,18 +149,18 @@ function renderPad(posX: number, posY: number) {
 }
 
 function computePoints(): void {
-  if (x + ballSize > canvas.width) {
+  if (sphere.x + sphere.radius > canvas.width) {
     p1Score.textContent = (Number(p1Score?.textContent) + 1).toString();
     resetBall("left");
-  } else if (x - ballSize < 0) {
+  } else if (sphere.x - sphere.radius < 0) {
     p2Score.textContent = (Number(p2Score?.textContent) + 1).toString();
     resetBall("right");
   }
 }
 
 function resetBall(direction: string): void {
-  x = canvas.width / 2;
-  y = canvas.height / 2;
+  sphere.x = canvas.width / 2;
+  sphere.y = canvas.height / 2;
   dx = speed;
   dy = speed;
 
