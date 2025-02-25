@@ -64,6 +64,11 @@ function gameloop(): void {
       sphere.position.y <= padRight.position.y + padHeight
     ) {
       sphere.dx = -sphere.dx;
+      let relativeIntersectY =
+        padRight.position.y + padHeight / 2 - sphere.position.y;
+      let normalizedRelativeIntersectionY =
+        relativeIntersectY / (padHeight / 2);
+      sphere.dy = -normalizedRelativeIntersectionY * sphere.speed;
     }
     if (
       sphere.position.x <= padLeft.position.x + padWidth &&
@@ -71,6 +76,11 @@ function gameloop(): void {
       sphere.position.y < padLeft.position.y + padHeight
     ) {
       sphere.dx = -sphere.dx;
+      let relativeIntersectY =
+        padLeft.position.y + padHeight / 2 - sphere.position.y;
+      let normalizedRelativeIntersectionY =
+        relativeIntersectY / (padHeight / 2);
+      sphere.dy = -normalizedRelativeIntersectionY * sphere.speed;
     }
   } else {
     computePoints();
