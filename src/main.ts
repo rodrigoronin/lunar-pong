@@ -7,11 +7,14 @@ const context: CanvasRenderingContext2D = canvas.getContext(
   "2d"
 ) as CanvasRenderingContext2D;
 
+let gameStopped: Boolean = true;
+let lastScore: string = "left";
+
 const p1Score: HTMLElement = document.getElementById("p1_score") as HTMLElement;
 const p2Score: HTMLElement = document.getElementById("p2_score") as HTMLElement;
 
-let x: number = 100;
-let y: number = 75;
+let x: number = canvas.width / 2;
+let y: number = canvas.height / 2;
 let ballSize: number = 8;
 const speed: number = 5;
 let dx: number = speed;
@@ -19,7 +22,7 @@ let dy: number = -speed;
 
 const padHeight: number = 120;
 const padWidth: number = 10;
-let padSpeed: number = 4;
+let padSpeed: number = 5;
 let padRigthX: number = 580;
 let padRightY: number = canvas.height / 2 - padHeight / 2;
 let padLeftX: number = 10;
@@ -39,8 +42,10 @@ function gameloop(): void {
   renderPad(padLeftX, padLeftY);
   renderPad(padRigthX, padRightY);
 
-  x += dx;
-  y += dy;
+  if (!gameStopped) {
+    x += dx;
+    y += dy;
+  }
 
   if (y + ballSize > canvas.height || y - ballSize < 0) {
     dy = -dy;
@@ -110,6 +115,10 @@ document.addEventListener(
     } else if (e.key === "ArrowDown") {
       keys.arrowDown.pressed = false;
     }
+
+    if (e.key === " ") {
+      gameStopped = !gameStopped;
+    }
   },
   true
 );
@@ -130,14 +139,17 @@ function renderPad(posX: number, posY: number) {
 function computePoints(): void {
   if (x + ballSize > canvas.width) {
     p1Score.textContent = (Number(p1Score?.textContent) + 1).toString();
-    resetBall("left");
+    lastScore = "left";
   } else if (x - ballSize < 0) {
     p2Score.textContent = (Number(p2Score?.textContent) + 1).toString();
-    resetBall("right");
+    lastScore = "right";
   }
+
+  gameStopped = true;
+  resetBall();
 }
 
-function resetBall(direction: string): void {
+function resetBall(): void {
   x = canvas.width / 2;
   y = canvas.height / 2;
   dx = speed;
@@ -145,7 +157,7 @@ function resetBall(direction: string): void {
 
   // Changes X direction based on who scored and randomizes the Y direction
   // from center to top or bottom
-  if (direction === "left") {
+  if (lastScore === "left") {
     dx = -dx;
     dy = (Math.random() < 0.5 ? -1 : 1) * speed;
   } else {
