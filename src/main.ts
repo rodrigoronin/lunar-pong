@@ -1,5 +1,6 @@
 import { canvas, c } from "./Config/Canvas";
 import { Sphere } from "./Entities/Sphere";
+import { Pad } from "./Entities/Pad";
 
 console.log("Game started!");
 
@@ -8,16 +9,27 @@ let lastScore: string = "left";
 
 const p1Score: HTMLElement = document.getElementById("p1_score") as HTMLElement;
 const p2Score: HTMLElement = document.getElementById("p2_score") as HTMLElement;
+const padWidth: number = 10;
+const padHeight: number = 120;
+let padSpeed: number = 5;
 
 const sphere: Sphere = new Sphere(canvas.width / 2, canvas.height / 2, 8, 5);
-
-const padHeight: number = 120;
-const padWidth: number = 10;
-let padSpeed: number = 5;
-let padRigthX: number = 580;
-let padRightY: number = canvas.height / 2 - padHeight / 2;
-let padLeftX: number = 10;
-let padLeftY: number = canvas.height / 2 - padHeight / 2;
+const padLeft: Pad = new Pad(
+  10,
+  canvas.height / 2 - padHeight / 2,
+  padWidth,
+  padHeight,
+  "green",
+  padSpeed
+);
+const padRight: Pad = new Pad(
+  580,
+  canvas.height / 2 - padHeight / 2,
+  padWidth,
+  padHeight,
+  "red",
+  padSpeed
+);
 
 const keys = {
   w: { pressed: false },
@@ -30,8 +42,8 @@ function gameloop(): void {
   c.clearRect(0, 0, canvas.width, canvas.height);
 
   sphere.render();
-  renderPad(padLeftX, padLeftY);
-  renderPad(padRigthX, padRightY);
+  padLeft.render();
+  padRight.render();
 
   if (!gameStopped) {
     sphere.position.x += sphere.dx;
@@ -47,16 +59,16 @@ function gameloop(): void {
 
   if (sphere.position.x + sphere.size < canvas.width && sphere.position.x > 0) {
     if (
-      sphere.position.x + sphere.size > padRigthX &&
-      sphere.position.y + sphere.size > padRightY &&
-      sphere.position.y <= padRightY + padHeight
+      sphere.position.x + sphere.size > padRight.position.x &&
+      sphere.position.y + sphere.size > padRight.position.y &&
+      sphere.position.y <= padRight.position.y + padHeight
     ) {
       sphere.dx = -sphere.dx;
     }
     if (
-      sphere.position.x <= padLeftX + padWidth &&
-      sphere.position.y + sphere.size > padLeftY &&
-      sphere.position.y < padLeftY + padHeight
+      sphere.position.x <= padLeft.position.x + padWidth &&
+      sphere.position.y + sphere.size > padLeft.position.y &&
+      sphere.position.y < padLeft.position.y + padHeight
     ) {
       sphere.dx = -sphere.dx;
     }
@@ -64,18 +76,21 @@ function gameloop(): void {
     computePoints();
   }
 
-  if (keys.w.pressed && padLeftY > 0) {
-    padLeftY -= padSpeed;
+  if (keys.w.pressed && padLeft.position.y > 0) {
+    padLeft.position.y -= padSpeed;
   }
-  if (keys.s.pressed && padLeftY < canvas.height - padHeight) {
-    padLeftY += padSpeed;
+  if (keys.s.pressed && padLeft.position.y < canvas.height - padHeight) {
+    padLeft.position.y += padSpeed;
   }
 
-  if (keys.arrowUp.pressed && padRightY > 0) {
-    padRightY -= padSpeed;
+  if (keys.arrowUp.pressed && padRight.position.y > 0) {
+    padRight.position.y -= padSpeed;
   }
-  if (keys.arrowDown.pressed && padRightY < canvas.height - padHeight) {
-    padRightY += padSpeed;
+  if (
+    keys.arrowDown.pressed &&
+    padRight.position.y < canvas.height - padHeight
+  ) {
+    padRight.position.y += padSpeed;
   }
 
   requestAnimationFrame(gameloop);

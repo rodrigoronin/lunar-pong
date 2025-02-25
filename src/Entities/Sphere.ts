@@ -20,6 +20,7 @@ export class Sphere {
     c.fillStyle = "white";
     c.arc(this.position.x, this.position.y, this.size, 0, 2 * Math.PI);
     c.fill();
+    c.closePath();
   }
 
   reset(direction: string) {
