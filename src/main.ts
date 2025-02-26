@@ -1,26 +1,35 @@
+import { canvas, c } from "./Config/Canvas";
+import { Sphere } from "./Entities/Sphere";
+import { Pad } from "./Entities/Pad";
+
 console.log("Game started!");
 
-const canvas: HTMLCanvasElement = document.getElementById(
-  "canvas",
-) as HTMLCanvasElement;
-const context: CanvasRenderingContext2D = canvas.getContext(
-  "2d",
-) as CanvasRenderingContext2D;
+let gameStopped: Boolean = true;
+let lastScore: string = "left";
 
 const p1Score: HTMLElement = document.getElementById("p1_score") as HTMLElement;
 const p2Score: HTMLElement = document.getElementById("p2_score") as HTMLElement;
-
-const speed: number = 5;
-let dx: number = speed;
-let dy: number = -speed;
-
-const padHeight: number = 120;
 const padWidth: number = 10;
-let padSpeed: number = 4;
-let padRigthX: number = 580;
-let padRightY: number = canvas.height / 2 - padHeight / 2;
-let padLeftX: number = 10;
-let padLeftY: number = canvas.height / 2 - padHeight / 2;
+const padHeight: number = 120;
+let padSpeed: number = 5;
+
+const sphere: Sphere = new Sphere(canvas.width / 2, canvas.height / 2, 8, 5);
+const padLeft: Pad = new Pad(
+  10,
+  canvas.height / 2 - padHeight / 2,
+  padWidth,
+  padHeight,
+  "green",
+  padSpeed
+);
+const padRight: Pad = new Pad(
+  580,
+  canvas.height / 2 - padHeight / 2,
+  padWidth,
+  padHeight,
+  "red",
+  padSpeed
+);
 
 const keys = {
   w: { pressed: false },
@@ -58,53 +67,68 @@ class Sphere {
 const sphere = new Sphere();
 
 function gameloop(): void {
-  context.clearRect(0, 0, canvas.width, canvas.height);
+  c.clearRect(0, 0, canvas.width, canvas.height);
 
-  sphere.draw();
-  renderPad(padLeftX, padLeftY);
-  renderPad(padRigthX, padRightY);
+  sphere.render();
+  padLeft.render();
+  padRight.render();
 
-  sphere.x += dx;
-  sphere.y += dy;
-
-  if (
-    sphere.y + sphere.radius > canvas.height ||
-    sphere.y - sphere.radius < 0
-  ) {
-    dy = -dy;
+  if (!gameStopped) {
+    sphere.position.x += sphere.dx;
+    sphere.position.y += sphere.dy;
   }
 
-  if (sphere.x + sphere.radius < canvas.width && sphere.x > 0) {
+  if (
+    sphere.position.y + sphere.size > canvas.height ||
+    sphere.position.y - sphere.size < 0
+  ) {
+    sphere.dy = -sphere.dy;
+  }
+
+  if (sphere.position.x + sphere.size < canvas.width && sphere.position.x > 0) {
     if (
-      sphere.x + sphere.radius > padRigthX &&
-      sphere.y + sphere.radius > padRightY &&
-      sphere.y <= padRightY + padHeight
+      sphere.position.x + sphere.size > padRight.position.x &&
+      sphere.position.y + sphere.size > padRight.position.y &&
+      sphere.position.y <= padRight.position.y + padHeight
     ) {
-      dx = -dx;
+      sphere.dx = -sphere.dx;
+      let relativeIntersectY =
+        padRight.position.y + padHeight / 2 - sphere.position.y;
+      let normalizedRelativeIntersectionY =
+        relativeIntersectY / (padHeight / 2);
+      sphere.dy = -normalizedRelativeIntersectionY * sphere.speed;
     }
     if (
-      sphere.x <= padLeftX + padWidth &&
-      sphere.y + sphere.radius > padLeftY &&
-      sphere.y < padLeftY + padHeight
+      sphere.position.x <= padLeft.position.x + padWidth &&
+      sphere.position.y + sphere.size > padLeft.position.y &&
+      sphere.position.y < padLeft.position.y + padHeight
     ) {
-      dx = -dx;
+      sphere.dx = -sphere.dx;
+      let relativeIntersectY =
+        padLeft.position.y + padHeight / 2 - sphere.position.y;
+      let normalizedRelativeIntersectionY =
+        relativeIntersectY / (padHeight / 2);
+      sphere.dy = -normalizedRelativeIntersectionY * sphere.speed;
     }
   } else {
     computePoints();
   }
 
-  if (keys.w.pressed && padLeftY > 0) {
-    padLeftY -= padSpeed;
+  if (keys.w.pressed && padLeft.position.y > 0) {
+    padLeft.position.y -= padSpeed;
   }
-  if (keys.s.pressed && padLeftY < canvas.height - padHeight) {
-    padLeftY += padSpeed;
+  if (keys.s.pressed && padLeft.position.y < canvas.height - padHeight) {
+    padLeft.position.y += padSpeed;
   }
 
-  if (keys.arrowUp.pressed && padRightY > 0) {
-    padRightY -= padSpeed;
+  if (keys.arrowUp.pressed && padRight.position.y > 0) {
+    padRight.position.y -= padSpeed;
   }
-  if (keys.arrowDown.pressed && padRightY < canvas.height - padHeight) {
-    padRightY += padSpeed;
+  if (
+    keys.arrowDown.pressed &&
+    padRight.position.y < canvas.height - padHeight
+  ) {
+    padRight.position.y += padSpeed;
   }
 
   requestAnimationFrame(gameloop);
@@ -138,41 +162,31 @@ document.addEventListener(
     } else if (e.key === "ArrowDown") {
       keys.arrowDown.pressed = false;
     }
+
+    if (e.key === " ") {
+      gameStopped = !gameStopped;
+    }
   },
   true,
 );
 
 function renderPad(posX: number, posY: number) {
-  context.fillStyle = "white";
-  context.fillRect(posX, posY, padWidth, padHeight);
-  context.fill();
+  c.fillStyle = "white";
+  c.fillRect(posX, posY, padWidth, padHeight);
+  c.fill();
 }
 
 function computePoints(): void {
-  if (sphere.x + sphere.radius > canvas.width) {
+  if (sphere.position.x + sphere.size > canvas.width) {
     p1Score.textContent = (Number(p1Score?.textContent) + 1).toString();
-    resetBall("left");
-  } else if (sphere.x - sphere.radius < 0) {
+    lastScore = "left";
+  } else if (sphere.position.x - sphere.size < 0) {
     p2Score.textContent = (Number(p2Score?.textContent) + 1).toString();
-    resetBall("right");
+    lastScore = "right";
   }
-}
 
-function resetBall(direction: string): void {
-  sphere.x = canvas.width / 2;
-  sphere.y = canvas.height / 2;
-  dx = speed;
-  dy = speed;
-
-  // Changes X direction based on who scored and randomizes the Y direction
-  // from center to top or bottom
-  if (direction === "left") {
-    dx = -dx;
-    dy = (Math.random() < 0.5 ? -1 : 1) * speed;
-  } else {
-    dx = speed;
-    dy = (Math.random() < 0.5 ? -1 : 1) * speed;
-  }
+  gameStopped = true;
+  sphere.reset(lastScore);
 }
 
 requestAnimationFrame(gameloop);
