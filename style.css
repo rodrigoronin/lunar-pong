@@ -13,10 +13,13 @@ canvas {
   align-items: center;
   gap: 1em;
   width: 10em;
-  left: calc(300px - 35px);
+  left: calc(300px - 37px);
   top: 40px;
 }
 span {
   color: white;
   font-size: 2em;
+}
+#canvas {
+  position: absolute;
 }

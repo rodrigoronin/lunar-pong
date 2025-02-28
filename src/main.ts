@@ -11,9 +11,15 @@ const p1Score: HTMLElement = document.getElementById("p1_score") as HTMLElement;
 const p2Score: HTMLElement = document.getElementById("p2_score") as HTMLElement;
 const padWidth: number = 10;
 const padHeight: number = 120;
-let padSpeed: number = 5;
+let padSpeed: number = 7;
+let sphereSpeed: number = 8;
 
-const sphere: Sphere = new Sphere(canvas.width / 2, canvas.height / 2, 8, 5);
+const sphere: Sphere = new Sphere(
+  canvas.width / 2,
+  canvas.height / 2,
+  8,
+  sphereSpeed
+);
 const padLeft: Pad = new Pad(
   10,
   canvas.height / 2 - padHeight / 2,
@@ -37,34 +43,6 @@ const keys = {
   arrowUp: { pressed: false },
   arrowDown: { pressed: false },
 };
-
-class Sphere {
-  x: number;
-  y: number;
-  radius: number;
-  speed: number;
-
-  constructor(
-    x = canvas.width / 2,
-    y = canvas.height / 2,
-    radius = 8,
-    speed = 5,
-  ) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.speed = speed;
-  }
-
-  draw(): void {
-    context.beginPath();
-    context.fillStyle = "white";
-    context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-    context.fill();
-  }
-}
-
-const sphere = new Sphere();
 
 function gameloop(): void {
   c.clearRect(0, 0, canvas.width, canvas.height);
@@ -147,7 +125,7 @@ document.addEventListener(
       keys.arrowDown.pressed = true;
     }
   },
-  true,
+  true
 );
 
 document.addEventListener(
@@ -167,14 +145,8 @@ document.addEventListener(
       gameStopped = !gameStopped;
     }
   },
-  true,
+  true
 );
-
-function renderPad(posX: number, posY: number) {
-  c.fillStyle = "white";
-  c.fillRect(posX, posY, padWidth, padHeight);
-  c.fill();
-}
 
 function computePoints(): void {
   if (sphere.position.x + sphere.size > canvas.width) {
